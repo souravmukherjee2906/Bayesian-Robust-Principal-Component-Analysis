@@ -3,6 +3,7 @@
 
 using namespace Rcpp;
 
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 NumericMatrix rcpp_only_diag_cumprod(NumericVector v){
