@@ -4,13 +4,15 @@
 using namespace Rcpp;
 
 //------------------------------------------------------------------------------------
+// All the necessary functions are listed below:
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 NumericMatrix rcpp_only_diag_cumprod(NumericVector v){
   int r = v.size();
   NumericVector cump_rev = cumprod(rev(v));
   NumericVector rev_cump_rev = rev(cump_rev);
-  NumericMatrix out(r); //equivalent to matrix(0, nrow = 2, ncol = 2)
+  NumericMatrix out(r); // Creates a r*r matrix of 0's. 
   for(int i=0; i<r; ++i){
     for(int j=0; j<r; ++j){
       if(i==j){
@@ -23,6 +25,11 @@ NumericMatrix rcpp_only_diag_cumprod(NumericVector v){
   return out;
 }
 
+
+//------------------------------------------------------------------------------------
+// Function for multiplication of two matrices: 
+// (without using any linear algebra library for C++)
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 NumericMatrix matrix_multiply(NumericMatrix A, NumericMatrix B){
@@ -41,6 +48,11 @@ NumericMatrix matrix_multiply(NumericMatrix A, NumericMatrix B){
 }
 
 
+//------------------------------------------------------------------------------------
+// Function for addition of two matrices: 
+// (without using any linear algebra library for C++)
+//------------------------------------------------------------------------------------
+
 // [[Rcpp::export]]
 NumericMatrix matrix_add(NumericMatrix A, NumericMatrix B){
   int n = A.nrow(), p = A.ncol();
@@ -53,6 +65,8 @@ NumericMatrix matrix_add(NumericMatrix A, NumericMatrix B){
   return out;
 }
 
+
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 NumericMatrix matrix_scalar_multiply(double k, NumericMatrix A){
@@ -67,6 +81,8 @@ NumericMatrix matrix_scalar_multiply(double k, NumericMatrix A){
 }
 
 
+//------------------------------------------------------------------------------------
+
 // [[Rcpp::export]]
 NumericMatrix rcpp_only_rustiefel(int n, int r){ 
   Environment rstiefel("package:rstiefel");
@@ -76,6 +92,8 @@ NumericMatrix rcpp_only_rustiefel(int n, int r){
 }
 
 
+//------------------------------------------------------------------------------------
+
 // [[Rcpp::export]]
 NumericMatrix rcpp_only_rmf_matrix(NumericMatrix M){ 
   Environment rstiefel("package:rstiefel");
@@ -84,6 +102,8 @@ NumericMatrix rcpp_only_rmf_matrix(NumericMatrix M){
   return out;
 }
 
+
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double rcpp_only_rtruncnorm(double a, double b, double mean, double sd){
@@ -95,6 +115,8 @@ double rcpp_only_rtruncnorm(double a, double b, double mean, double sd){
 }
 
 
+//------------------------------------------------------------------------------------
+
 // [[Rcpp::export]]
 double rcpp_only_rinvgamma(double shape, double rate){ 
   Environment invgamma("package:invgamma"); 
@@ -105,6 +127,8 @@ double rcpp_only_rinvgamma(double shape, double rate){
 }
 
 
+//------------------------------------------------------------------------------------
+
 // [[Rcpp::export]]
 double rcpp_only_invgamma(double shape, double rate){
   double scale = 1/rate;
@@ -113,6 +137,8 @@ double rcpp_only_invgamma(double shape, double rate){
   return out;
 }
 
+
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 NumericVector rcpp_only_d_update_mat(NumericVector d, NumericMatrix A, double Sigma2, int n, int p, int r) {
@@ -175,7 +201,9 @@ NumericVector rcpp_only_d_update_mat(NumericVector d, NumericMatrix A, double Si
 }
 
 
+//------------------------------------------------------------------------------------
 // creating the function for 1:burn_in below:
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMatrix D, NumericMatrix D2, NumericMatrix V, NumericMatrix V2, NumericMatrix S, NumericMatrix S2, NumericVector d, NumericVector d2, double Sigma2, double Sigma22, double tow2, double q1, double q2, int n, int p, int r, int burn_in, double a, double b){
@@ -334,7 +362,9 @@ List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMat
 }
 
 
+//------------------------------------------------------------------------------------
 // Creating the function for AFTER BURN IN:
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMatrix D, NumericMatrix D2, NumericMatrix V, NumericMatrix V2, NumericMatrix L, NumericMatrix L2, NumericMatrix S, NumericMatrix S2, NumericMatrix S_count, NumericMatrix S_count2, NumericVector d, NumericVector d2, NumericVector d_star, double Sigma2, double Sigma22, double tow2, double q1, double q2, int n, int p, int r, int K, int burn_in, double a, double b){
