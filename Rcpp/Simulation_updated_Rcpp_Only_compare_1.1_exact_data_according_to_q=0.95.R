@@ -2,6 +2,7 @@ if(!require(Rcpp)) install.packages("Rcpp")
 library(Rcpp)
 sourceCpp("Simulation_updated_Rcpp_Only_compare_1.1_exact_data_according_to_q=0.95.cpp")
 
+#------------------------------------------------------------------------------------
 
 # User Input
 q1 <- 0.95   # For any n, Actual data Y_(n*n) (in particular, S_star_(n*n)) will be generated according to q = 0.95
