@@ -69,15 +69,15 @@ b <- 1  # Rate parameter for the inverse gamma distribution of sigma^2.
 K <- 40000  # Total number of iterations.
 burn_in <- 10000 # Number of burn-ins.
 tow2 <- 20  # The variance tow^2 of the normal distribution in the mixture prior of S.
+iterations <- seq(0, (K - burn_in))
 
 
 #------------------------------------------------------------------------------------
-## Create the pdf file for traceplots for Method 1: q1 = 0.95 and Method 2: q2 = 0.90
+## Create a pdf file containing the traceplots for Method 1: q1 = 0.95 and 
+## Method 2: q2 = 0.90
 #------------------------------------------------------------------------------------
 pdf('Rcpp_compare_1.1_AfterBurnin=30k_Burnin=10k_a=5000_b=1.pdf', 
     width = 11.694, height = 8.264)
-
-iterations <- seq(0, (K - burn_in))  # Required for ggplot in Traceplot.
 
 
 #------------------------------------------------------------------------------------
