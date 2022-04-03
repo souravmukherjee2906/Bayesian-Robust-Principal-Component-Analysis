@@ -59,13 +59,14 @@ q1 <- 0.95
 q2 <- 0.90
 
 # Values of n. 
-n_values_seq <- seq.int(from = 100, to = 300, by = 100)  # n = 100, 200, 300.
+n_values_seq <- seq.int(from = 100, to = 3000, by = 100)
 
 ## WE ARE CONSIDERING n*n SQUARE MATRICES ONLY.
 
 # Other input values
 a <- 5000 # Shape parameter for the inverse gamma distribution of sigma^2.
 b <- 1  # Rate parameter for the inverse gamma distribution of sigma^2.
+# We can simulate with another choice of (a,b), e.g., (a,b) = (4,5).
 K <- 40000  # Total number of iterations.
 burn_in <- 10000 # Number of burn-ins.
 tow2 <- 20  # The variance tow^2 of the normal distribution in the mixture prior of S.
