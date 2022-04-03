@@ -1,7 +1,7 @@
 ## We are trying to decompose a noisy image matrix into low-rank component (foreground),
 ## sparse component and noise component (background).
 ## This file contains codes for the simulation of estimates of the low-rank and sparse
-## components.
+## components for several iterations.
 
 
 #------------------------------------------------------------------------------------
