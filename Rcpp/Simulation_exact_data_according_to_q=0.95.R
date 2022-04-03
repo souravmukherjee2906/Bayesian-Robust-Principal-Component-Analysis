@@ -45,7 +45,7 @@ library(ggplot2)
 #------------------------------------------------------------------------------------
 ## Source all the necessary functions from the corresponding .cpp file.
 #------------------------------------------------------------------------------------
-sourceCpp("Simulation_updated_Rcpp_Only_compare_1.1_exact_data_according_to_q=0.95.cpp")
+sourceCpp("Functions.cpp")
 
 
 #------------------------------------------------------------------------------------
