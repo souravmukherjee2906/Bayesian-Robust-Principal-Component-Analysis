@@ -67,6 +67,9 @@ NumericMatrix matrix_add(NumericMatrix A, NumericMatrix B){
 
 
 //------------------------------------------------------------------------------------
+// Function for scalar multiplication of two matrices: 
+// (without using any linear algebra library for C++)
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 NumericMatrix matrix_scalar_multiply(double k, NumericMatrix A){
@@ -82,6 +85,10 @@ NumericMatrix matrix_scalar_multiply(double k, NumericMatrix A){
 
 
 //------------------------------------------------------------------------------------
+// Siumlate a random orthonormal matrix from the uniform distribution on the Stiefel 
+// manifold.
+// (Using the "rstiefel" package in R)
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 NumericMatrix rcpp_only_rustiefel(int n, int r){ 
@@ -93,6 +100,9 @@ NumericMatrix rcpp_only_rustiefel(int n, int r){
 
 
 //------------------------------------------------------------------------------------
+// Simulate a random orthonormal matrix from the von Mises-Fisher distribution.
+// (Using the "rstiefel" package in R)
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 NumericMatrix rcpp_only_rmf_matrix(NumericMatrix M){ 
@@ -103,6 +113,10 @@ NumericMatrix rcpp_only_rmf_matrix(NumericMatrix M){
 }
 
 
+//------------------------------------------------------------------------------------
+// Function for random generation from the truncated normal distribution with mean
+// equal to 'mean' and standard deviation equal to 'sd'.
+// (Using the "truncnorm" package in R)
 //------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
@@ -116,6 +130,9 @@ double rcpp_only_rtruncnorm(double a, double b, double mean, double sd){
 
 
 //------------------------------------------------------------------------------------
+// Function for random generation from the inverse gamma distribution.
+// (Using the "invgamma" package in R)
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double rcpp_only_rinvgamma(double shape, double rate){ 
@@ -128,6 +145,9 @@ double rcpp_only_rinvgamma(double shape, double rate){
 
 
 //------------------------------------------------------------------------------------
+// Alternative function for random generation from the inverse gamma distribution.
+// (Using the inbuilt "rgamma" command in Rcpp, and then taking the inverse)
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double rcpp_only_invgamma(double shape, double rate){
@@ -139,10 +159,13 @@ double rcpp_only_invgamma(double shape, double rate){
 
 
 //------------------------------------------------------------------------------------
+// Function for updating the vector d in each iteration.
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
-NumericVector rcpp_only_d_update_mat(NumericVector d, NumericMatrix A, double Sigma2, int n, int p, int r) {
-  //RNGScope scope; ??
+NumericVector rcpp_only_d_update_mat(NumericVector d, NumericMatrix A, double Sigma2, 
+                                     int n, int p, int r) {
+  
   for(int i = 0; i < r; ++i){
     NumericMatrix D_cap(r);
     for(int j=0; j< r; ++j){
@@ -157,34 +180,16 @@ NumericVector rcpp_only_d_update_mat(NumericVector d, NumericMatrix A, double Si
             }
           }
         }
-        else
+        else{
           D_cap(j,k) = 0;
+        }
       }
     }
     
-    /*  
-     D_cap = D_cap/d[i];
-     
-     double num = matrix_trace(matrix_multiply(D_cap,A));
-     double denom = matrix_trace(matrix_dot_multiply(D_cap,D_cap)) + Sigma2;
-     double mu = num/denom;
-     double sigma = sqrt(Sigma2/denom);
-     
-     if (i < r-1){
-     d[i] = rcpp_only_rtruncnorm(1, R_PosInf, mu, sigma);
-     }
-     else{
-     d[i] = rcpp_only_rtruncnorm(0, R_PosInf, mu, sigma);
-     }
-     */    
-    
     double num = 0;
-    for(int j=0; j<r; ++j){
-      num = num + (D_cap(j,j)*A(j,j));
-    }
-    
     double denom = 0;
     for(int j=0; j<r; ++j){
+      num = num + (D_cap(j,j)*A(j,j));
       denom = denom + pow(D_cap(j,j), 2.0);
     }
     denom = denom + Sigma2;
@@ -202,11 +207,16 @@ NumericVector rcpp_only_d_update_mat(NumericVector d, NumericMatrix A, double Si
 
 
 //------------------------------------------------------------------------------------
-// creating the function for 1:burn_in below:
+// Creating the function for 1:burn_in below:
+// This function updates the matrices U, V, D, L and S in each iteration in 1:burn_in.
 //------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
-List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMatrix D, NumericMatrix D2, NumericMatrix V, NumericMatrix V2, NumericMatrix S, NumericMatrix S2, NumericVector d, NumericVector d2, double Sigma2, double Sigma22, double tow2, double q1, double q2, int n, int p, int r, int burn_in, double a, double b){
+List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMatrix D, 
+                  NumericMatrix D2, NumericMatrix V, NumericMatrix V2, NumericMatrix S, 
+                  NumericMatrix S2, NumericVector d, NumericVector d2, double Sigma2, 
+                  double Sigma22, double tow2, double q1, double q2, int n, int p, 
+                  int r, int burn_in, double a, double b){
   int c = 0;
   
   NumericMatrix L(n,p);
@@ -215,9 +225,6 @@ List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMat
   NumericMatrix S_count2(n,p);
   
   for(int count = 0; count < burn_in; ++count){
-    
-    //double inv_Sigma2 = 1/Sigma2;
-    //double inv_Sigma22 = 1/Sigma22;
     
     // Update the value of U for Method 1 and 2
     NumericMatrix U11(n,r);
@@ -236,9 +243,7 @@ List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMat
     }
     
     U = rcpp_only_rmf_matrix(U11);
-    //    Rcout << "The value of U : \n" << U << "\n";
     U2 = rcpp_only_rmf_matrix(U22);
-    //    Rcout << "The value of U2 : \n" << U2 << "\n";
     
     // Update the value of V for Method 1 and 2
     NumericMatrix V11(p,r);
@@ -257,27 +262,37 @@ List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMat
     }
     
     V = rcpp_only_rmf_matrix(V11);
-    //    Rcout << "The value of V : \n" << V << "\n";
     V2 = rcpp_only_rmf_matrix(V22);
-    //    Rcout << "The value of V2 : \n" << V2 << "\n";
-    
     
     // Update the value of d one at a time for Method 1 and 2
-    d = rcpp_only_d_update_mat(clone(d), matrix_multiply(transpose(matrix_multiply(matrix_add(Y, matrix_scalar_multiply(-1, S)), V)), U), Sigma2, n, p, r);
-    //    Rcout << "The value of d : \n" << d << "\n";
-    d2 = rcpp_only_d_update_mat(clone(d2), matrix_multiply(transpose(matrix_multiply(matrix_add(Y, matrix_scalar_multiply(-1, S2)), V2)), U2), Sigma22, n, p, r);
-    //    Rcout << "The value of d2 : \n" << d2 << "\n";
+    d = rcpp_only_d_update_mat(clone(d), 
+                               matrix_multiply(
+                                 transpose(
+                                   matrix_multiply(
+                                     matrix_add(Y, matrix_scalar_multiply(-1, S)), 
+                                     V
+                                   )
+                                 ), 
+                                 U
+                               ), 
+                               Sigma2, n, p, r);
     
-    // Once we got the updated set of elements in vector d, it's time to Update D for both Methods
+    d2 = rcpp_only_d_update_mat(clone(d2), 
+                                matrix_multiply(
+                                  transpose(
+                                    matrix_multiply(
+                                      matrix_add(Y, matrix_scalar_multiply(-1, S2)), 
+                                      V2
+                                    )
+                                  ), 
+                                  U2
+                                ), 
+                                Sigma22, n, p, r);
+    
+    // Once we got the updated set of elements in vector d, it's time to Update D for 
+    // both Methods.
     D = rcpp_only_diag_cumprod(d);
-    //    Rcout << "The value of D : \n" << D << "\n";
     D2 = rcpp_only_diag_cumprod(d2);
-    //    Rcout << "The value of D2 : \n" << D2 << "\n";
-    
-    //    Rcout << "The value of L : \n" << L << "\n";
-    //    Rcout << "The value of L2 : \n" << L2 << "\n";
-    
-    
     
     // Update the value of L and then S for Method 1 and 2
     NumericMatrix S_rnorm(n, p);
@@ -289,20 +304,15 @@ List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMat
       S_rnorm2(_ , j) = Rcpp::rnorm(n, 0, sqrt((tow2 * Sigma22)/(tow2 + Sigma22)));
     }
     
-    // NumericMatrix S_mu_rnorm(n,p);
-    // NumericMatrix Q_star_matrix(n, p);
     NumericMatrix S_MCC(n,p);
-    // NumericMatrix S_mu_rnorm2(n,p);
-    // NumericMatrix Q_star_matrix2(n,p);
     NumericMatrix S_MCC2(n,p);
-    
     double rate = 0;
     double rate2 = 0;
     
     for(int i=0; i<n; ++i){
       for(int j=0; j<p; ++j){
         
-        // It is needed for updating L
+        // Update L
         double temp1 = 0;
         double temp2 = 0;
         for(int l=0; l<r; ++l){
@@ -312,14 +322,10 @@ List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMat
         L(i,j) = temp1;
         L2(i,j) = temp2;    
         
-        // It is needed for updating S
-        // S_mu_rnorm(i,j) = ((tow2/(tow2 + Sigma2))*(Y(i,j) - L(i,j))) + S_rnorm(i,j);
-        // S_mu_rnorm2(i,j) = ((tow2/(tow2 + Sigma22))*(Y(i,j) - L2(i,j))) + S_rnorm2(i,j);
-        
-        // Q_star_matrix(i,j) = q1/(q1 + (((1-q1) * sqrt(Sigma2) * exp((tow2 * pow(Y(i,j) - L(i,j), 2.0))/(2 * Sigma2 * (tow2 + Sigma2))))/sqrt(tow2 + Sigma2)));
-        // Q_star_matrix2(i,j) = q2/(q2 + (((1-q2) * sqrt(Sigma22) * exp((tow2 * pow(Y(i,j) - L2(i,j), 2.0))/(2 * Sigma22 * (tow2 + Sigma22))))/sqrt(tow2 + Sigma22)));
-        
-        if(S_runif(i,j) > (q1/(q1 + (((1-q1) * sqrt(Sigma2) * exp((tow2 * pow(Y(i,j) - L(i,j), 2.0))/(2 * Sigma2 * (tow2 + Sigma2))))/sqrt(tow2 + Sigma2))))){
+        // Update S
+        if(S_runif(i,j) > 
+           (q1/(q1 + (((1-q1) * sqrt(Sigma2) * exp((tow2 * pow(Y(i,j) - L(i,j), 2.0))/(2 * Sigma2 * (tow2 + Sigma2))))/sqrt(tow2 + Sigma2))))
+          ){
           S_MCC(i,j) = 1;
           S_count(i,j) = 0;
         }else{
@@ -327,7 +333,9 @@ List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMat
           S_count(i,j) = 1;
         }
         
-        if(S_runif(i,j) > (q2/(q2 + (((1-q2) * sqrt(Sigma22) * exp((tow2 * pow(Y(i,j) - L2(i,j), 2.0))/(2 * Sigma22 * (tow2 + Sigma22))))/sqrt(tow2 + Sigma22))))){
+        if(S_runif(i,j) > 
+           (q2/(q2 + (((1-q2) * sqrt(Sigma22) * exp((tow2 * pow(Y(i,j) - L2(i,j), 2.0))/(2 * Sigma22 * (tow2 + Sigma22))))/sqrt(tow2 + Sigma22))))
+          ){
           S_MCC2(i,j) = 1;
           S_count2(i,j) = 0;
         }else{
@@ -343,31 +351,38 @@ List Simul_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMat
       }
     }
     
-    //    Rcout << "The value of S : \n" << S << "\n";
-    //    Rcout << "The value of S2 : \n" << S2 << "\n";
     // Update the value of Sigma2 for Method 1 and 2
-    //    double shape = (n * p * 0.5) + a;
-    //    rate = b + (0.5 * rate);
-    //    rate2 = b + (0.5 * rate2);
     Sigma2 = rcpp_only_rinvgamma((n * p * 0.5) + a, b + (0.5 * rate));
     Sigma22 = rcpp_only_rinvgamma((n * p * 0.5) + a, b + (0.5 * rate2));
-    //    Rcout << "The value of Sigma2 : \n" << Sigma2 << "\n";
-    //    Rcout << "The value of Sigma22 : \n" << Sigma22 << "\n";
     
     c = c + 1;
     
   }
   
-  return List::create(_["L"] = L, _["L2"] = L2, _["U"] = U, _["U2"] = U2, _["V"] = V, _["V2"] = V2, _["S"] = S, _["S2"] = S2, _["S_count"] = S_count, _["S_count2"] = S_count2, _["d"] = d, _["d2"] = d2, _["D"] = D, _["D2"] = D2, _["Sigma2"] = Sigma2, _["Sigma22"] = Sigma22, _["c"] = c);
+  return List::create(_["L"] = L, _["L2"] = L2, _["U"] = U, _["U2"] = U2, _["V"] = V, 
+                      _["V2"] = V2, _["S"] = S, _["S2"] = S2, _["S_count"] = S_count, 
+                      _["S_count2"] = S_count2, _["d"] = d, _["d2"] = d2, _["D"] = D, 
+                      _["D2"] = D2, _["Sigma2"] = Sigma2, _["Sigma22"] = Sigma22, 
+                      _["c"] = c
+                     );
 }
 
 
 //------------------------------------------------------------------------------------
 // Creating the function for AFTER BURN IN:
+// This function updates the matrices U, V, D, L and S in each iteration in the AFTER
+// Burn-in period.
 //------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
-List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, NumericMatrix D, NumericMatrix D2, NumericMatrix V, NumericMatrix V2, NumericMatrix L, NumericMatrix L2, NumericMatrix S, NumericMatrix S2, NumericMatrix S_count, NumericMatrix S_count2, NumericVector d, NumericVector d2, NumericVector d_star, double Sigma2, double Sigma22, double tow2, double q1, double q2, int n, int p, int r, int K, int burn_in, double a, double b){
+List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, 
+                        NumericMatrix D, NumericMatrix D2, NumericMatrix V, 
+                        NumericMatrix V2, NumericMatrix L, NumericMatrix L2, 
+                        NumericMatrix S, NumericMatrix S2, NumericMatrix S_count, 
+                        NumericMatrix S_count2, NumericVector d, NumericVector d2, 
+                        NumericVector d_star, double Sigma2, double Sigma22, 
+                        double tow2, double q1, double q2, int n, int p, int r, int K, 
+                        int burn_in, double a, double b){
   int c1 = 0;
   int c2 = 0;
   
@@ -415,9 +430,7 @@ List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, Nume
     }
     
     U = rcpp_only_rmf_matrix(U11);
-    //    Rcout << "The value of U : \n" << U << "\n";
     U2 = rcpp_only_rmf_matrix(U22);
-    //    Rcout << "The value of U2 : \n" << U2 << "\n";
     
     // Update the value of V for Method 1 and 2
     NumericMatrix V11(p,r);
@@ -436,21 +449,37 @@ List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, Nume
     }
     
     V = rcpp_only_rmf_matrix(V11);
-    //    Rcout << "The value of V : \n" << V << "\n";
     V2 = rcpp_only_rmf_matrix(V22);
-    //    Rcout << "The value of V2 : \n" << V2 << "\n";
     
     // Update the value of d one at a time for Method 1 and 2
-    d = rcpp_only_d_update_mat(clone(d), matrix_multiply(transpose(matrix_multiply(matrix_add(Y, matrix_scalar_multiply(-1, S)), V)), U), Sigma2, n, p, r);
-    //    Rcout << "The value of d : \n" << d << "\n";
-    d2 = rcpp_only_d_update_mat(clone(d2), matrix_multiply(transpose(matrix_multiply(matrix_add(Y, matrix_scalar_multiply(-1, S2)), V2)), U2), Sigma22, n, p, r);
-    //    Rcout << "The value of d2 : \n" << d2 << "\n";
+    d = rcpp_only_d_update_mat(clone(d), 
+                               matrix_multiply(
+                                 transpose(
+                                   matrix_multiply(
+                                     matrix_add(Y, matrix_scalar_multiply(-1, S)), 
+                                     V
+                                   )
+                                 ), 
+                                 U
+                               ), 
+                               Sigma2, n, p, r);
     
-    // Once we got the updated set of elements in vector d, it's time to Update D for both Methods
+    d2 = rcpp_only_d_update_mat(clone(d2), 
+                                matrix_multiply(
+                                  transpose(
+                                    matrix_multiply(
+                                      matrix_add(Y, matrix_scalar_multiply(-1, S2)), 
+                                      V2
+                                    )
+                                  ), 
+                                  U2
+                                ), 
+                                Sigma22, n, p, r);
+    
+    // Once we got the updated set of elements in vector d, it's time to Update D for 
+    // both Methods.
     D = rcpp_only_diag_cumprod(d);
-    //    Rcout << "The value of D : \n" << D << "\n";
     D2 = rcpp_only_diag_cumprod(d2);
-    //    Rcout << "The value of D2 : \n" << D2 << "\n";
     
     // Update the value of L and then S for Method 1 and 2
     NumericMatrix S_rnorm(n, p);
@@ -462,10 +491,8 @@ List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, Nume
       S_rnorm2(_ , j) = Rcpp::rnorm(n, 0, sqrt((tow2 * Sigma22)/(tow2 + Sigma22)));
     }
     
-    
     NumericMatrix S_MCC(n,p);
     NumericMatrix S_MCC2(n,p);
-    
     double rate = 0;
     double rate2 = 0;
     
@@ -488,7 +515,9 @@ List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, Nume
         L_hat(i,j) = ((double)1/(count + 2)) * L_sum(i,j);
         L_hat2(i,j) = ((double)1/(count + 2)) * L_sum2(i,j);
         
-        if(S_runif(i,j) > (q1/(q1 + (((1-q1) * sqrt(Sigma2) * exp((tow2 * pow(Y(i,j) - L(i,j), 2.0))/(2 * Sigma2 * (tow2 + Sigma2))))/sqrt(tow2 + Sigma2))))){
+        if(S_runif(i,j) > 
+           (q1/(q1 + (((1-q1) * sqrt(Sigma2) * exp((tow2 * pow(Y(i,j) - L(i,j), 2.0))/(2 * Sigma2 * (tow2 + Sigma2))))/sqrt(tow2 + Sigma2))))
+          ){
           S_MCC(i,j) = 1;
           S_count(i,j) = S_count(i,j);
         }else{
@@ -496,7 +525,9 @@ List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, Nume
           S_count(i,j) = S_count(i,j) + 1;
         }
         
-        if(S_runif(i,j) > (q2/(q2 + (((1-q2) * sqrt(Sigma22) * exp((tow2 * pow(Y(i,j) - L2(i,j), 2.0))/(2 * Sigma22 * (tow2 + Sigma22))))/sqrt(tow2 + Sigma22))))){
+        if(S_runif(i,j) > 
+           (q2/(q2 + (((1-q2) * sqrt(Sigma22) * exp((tow2 * pow(Y(i,j) - L2(i,j), 2.0))/(2 * Sigma22 * (tow2 + Sigma22))))/sqrt(tow2 + Sigma22))))
+          ){
           S_MCC2(i,j) = 1;
           S_count2(i,j) = S_count2(i,j);
         }else{
@@ -516,70 +547,51 @@ List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2, Nume
       }
     }
     
-    //    Rcout << "The value of S : \n" << S << "\n";
-    //    Rcout << "The value of S2 : \n" << S2 << "\n";
     // Update the value of Sigma2 for Method 1 and 2
-    //    double shape = (n * p * 0.5) + a;
-    //    rate = b + (0.5 * rate);
-    //    rate2 = b + (0.5 * rate2);
     Sigma2 = rcpp_only_rinvgamma((n * p * 0.5) + a, b + (0.5 * rate));
     Sigma22 = rcpp_only_rinvgamma((n * p * 0.5) + a, b + (0.5 * rate2));
-    //    Rcout << "The value of Sigma2 : \n" << Sigma2 << "\n";
-    //    Rcout << "The value of Sigma22 : \n" << Sigma22 << "\n";
-    
     
     // Update d_sum and d_bar for both Methods
-    d_sum = d_sum + d;  // Rcpp only allows element-wise arithmetic operatiosn for vectors, not for matrices.
-    //    Rcout << "The value of d_sum : \n" << d_sum << "\n";
+    d_sum = d_sum + d;
     d_sum2 = d_sum2 + d2;
-    //    Rcout << "The value of d_sum2 : \n" << d_sum2 << "\n";
-    
     d_bar = d_sum/(count + 2);
-    //    Rcout << "The value of d_bar : \n" << d_bar << "\n";
     d_bar2 = d_sum2/(count + 2);
-    //    Rcout << "The value of d_bar2 : \n" << d_bar2 << "\n";
-    
     
     // Update Sigma2_sum and Sigma2_bar for both methods
     Sigma2_sum = Sigma2_sum + Sigma2;
-    //    Rcout << "The value of Sigma2_sum : \n" << Sigma2_sum << "\n";
     Sigma2_sum2 = Sigma2_sum2 + Sigma22;
-    //    Rcout << "The value of Sigma2_sum2 : \n" << Sigma2_sum2 << "\n";
-    
     Sigma2_bar = Sigma2_sum/(count + 2);
-    //    Rcout << "The value of Sigma2_bar : \n" << Sigma2_bar << "\n";
     Sigma2_bar2 = Sigma2_sum2/(count + 2);
-    //    Rcout << "The value of Sigma2_bar2 : \n" << Sigma2_bar2 << "\n";
-    
     
     // Update dbar_list for both methods
     dbar_list[count + 1] = clone(d_bar);
     dbar_list2[count + 1] = clone(d_bar2);
     
-    
     // Update the distances for both methods
     distance_d = max(abs(d_bar - d_star));
-    //    Rcout << "The value of distance_d : \n" << distance_d << "\n";
     distance_d2 = max(abs(d_bar2 - d_star));
-    //    Rcout << "The value of distance_d2 : \n" << distance_d2 << "\n";
-    
-    distance_Sigma2 = std::abs(Sigma2_bar - 0.01);  // For scalar version, abs() is for int type. Either use std::abs() for double type or fabs() for float type.
-    /*  if(Sigma2_bar >= 0.01){
-     distance_Sigma2 = Sigma2_bar - 0.01;
-    }else{
-     distance_Sigma2 = 0.01 - Sigma2_bar;
-    }    */
-    //    Rcout << "The value of distance_Sigma2 : \n" << distance_Sigma2 << "\n";
+    distance_Sigma2 = std::abs(Sigma2_bar - 0.01);  // For scalar version, abs() has type 'int'. 
+                                                    // So, either use std::abs() for double type
+                                                    // or fabs() for float type.
     distance_Sigma22 = std::abs(Sigma2_bar2 - 0.01);
-    //    Rcout << "The value of distance_Sigma22 : \n" << distance_Sigma22 << "\n";
     
     c1 = c1 + 1;
-    c2 = c2 + 1;
-    
+    c2 = c2 + 1; 
   }
   
-  List Method1 = List::create(_["L"] = L, _["L_hat"] = L_hat, _["U"] = U, _["V"] = V, _["S"] = S, _["S_count"] = S_count, _["S_sum"] = S_sum, _["d"] = d, _["d_bar"] = d_bar, _["dbar_list"] = dbar_list, _["D"] = D, _["Sigma2"] = Sigma2, _["Sigma2_bar"] = Sigma2_bar, _["distance_d"] = distance_d, _["distance_Sigma2"] = distance_Sigma2, _["c1"] = c1);
-  List Method2 = List::create(_["L2"] = L2, _["L_hat2"] = L_hat2, _["U2"] = U2, _["V2"] = V2, _["S2"] = S2, _["S_count2"] = S_count2, _["S_sum2"] = S_sum2, _["d2"] = d2, _["d_bar2"] = d_bar2, _["dbar_list2"] = dbar_list2, _["D2"] = D2, _["Sigma22"] = Sigma22, _["Sigma2_bar2"] = Sigma2_bar2, _["distance_d2"] = distance_d2, _["distance_Sigma22"] = distance_Sigma22, _["c2"] = c2);
+  List Method1 = List::create(_["L"] = L, _["L_hat"] = L_hat, _["U"] = U, _["V"] = V, 
+                              _["S"] = S, _["S_count"] = S_count, _["S_sum"] = S_sum, 
+                              _["d"] = d, _["d_bar"] = d_bar, _["dbar_list"] = dbar_list, 
+                              _["D"] = D, _["Sigma2"] = Sigma2, _["Sigma2_bar"] = Sigma2_bar, 
+                              _["distance_d"] = distance_d, _["distance_Sigma2"] = distance_Sigma2, 
+                              _["c1"] = c1);
+  
+  List Method2 = List::create(_["L2"] = L2, _["L_hat2"] = L_hat2, _["U2"] = U2, _["V2"] = V2, 
+                              _["S2"] = S2, _["S_count2"] = S_count2, _["S_sum2"] = S_sum2, 
+                              _["d2"] = d2, _["d_bar2"] = d_bar2, _["dbar_list2"] = dbar_list2, 
+                              _["D2"] = D2, _["Sigma22"] = Sigma22, _["Sigma2_bar2"] = Sigma2_bar2, 
+                              _["distance_d2"] = distance_d2, _["distance_Sigma22"] = distance_Sigma22, 
+                              _["c2"] = c2);
+  
   return List::create(_["M1"] = Method1, _["M2"] = Method2);
 }
-
