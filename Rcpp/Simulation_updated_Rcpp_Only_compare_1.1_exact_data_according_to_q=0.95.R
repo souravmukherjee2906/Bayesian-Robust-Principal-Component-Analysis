@@ -87,7 +87,6 @@ iterations <- seq(0, (K - burn_in))  # Required for ggplot in Traceplot.
 #------------------------------------------------------------------------------------
 
 for(n in n_values_seq){
-  
   p <- n
   r <- round(0.05*n)    # 1 <= r <= n
   
