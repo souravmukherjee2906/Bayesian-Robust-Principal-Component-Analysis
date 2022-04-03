@@ -54,7 +54,6 @@ sourceCpp("Simulation_updated_Rcpp_Only_compare_1.1_exact_data_according_to_q=0.
 # For any n, actual data Y_(n*n) [in particular, true S_(n*n)] will be generated 
 # according to q = 0.95 based on Method 1.
 q1 <- 0.95
-
 # Value of q for Method 2.
 q2 <- 0.90
 
@@ -77,7 +76,7 @@ iterations <- seq(0, (K - burn_in))
 ## Create a pdf file containing the traceplots for Method 1: q1 = 0.95 and 
 ## Method 2: q2 = 0.90
 #------------------------------------------------------------------------------------
-pdf('Rcpp_compare_1.1_AfterBurnin=30k_Burnin=10k_a=5000_b=1.pdf', 
+pdf('Simulation_AfterBurnin=30k_Burnin=10k_a=5000_b=1.pdf', 
     width = 11.694, height = 8.264)
 
 
