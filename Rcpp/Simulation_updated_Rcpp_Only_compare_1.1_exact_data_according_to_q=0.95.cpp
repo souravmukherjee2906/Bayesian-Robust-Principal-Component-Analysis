@@ -595,3 +595,4 @@ List Simul_after_burnin(NumericMatrix Y, NumericMatrix U, NumericMatrix U2,
   
   return List::create(_["M1"] = Method1, _["M2"] = Method2);
 }
+
