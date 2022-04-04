@@ -107,10 +107,10 @@ lrcpp_besselI(5,500,T)
 lrcpp_boost_besselI(5,500,T)
 lrcpp_boost_besselI_overflow_fixed(5,500,T)
 
-microbenchmark(besselI(5,500,T), log(besselI(5,500,T)), rcpp_besselI(5,500,T), 
-               lrcpp_besselI(5,500,T), rcpp_boost_besselI(5,500,T), 
-               lrcpp_boost_besselI(5,500,T), rcpp_boost_besselI_overflow_fixed(5,500,T), 
-               lrcpp_boost_besselI_overflow_fixed(5,500,T)
+microbenchmark(besselI(5,500,T), log(besselI(5,500,T)), 
+               rcpp_besselI(5,500,T), lrcpp_besselI(5,500,T), 
+               rcpp_boost_besselI(5,500,T), lrcpp_boost_besselI(5,500,T), 
+               rcpp_boost_besselI_overflow_fixed(5,500,T), lrcpp_boost_besselI_overflow_fixed(5,500,T)
                )
 
 */
