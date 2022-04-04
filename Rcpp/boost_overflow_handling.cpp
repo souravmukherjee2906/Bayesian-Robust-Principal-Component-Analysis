@@ -1,14 +1,12 @@
-//#include <Rcpp.h>
-//#include <Rmath.h>
 #define ARMA_64BIT_WORD
 #include <RcppArmadillo.h>
 #include <algorithm>
 #include <boost/math/special_functions/bessel.hpp>
 
 
-
 using namespace Rcpp;
 using namespace arma;
+
 
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(BH)]]
@@ -17,17 +15,14 @@ using namespace arma;
 namespace myspace
 {
 using namespace boost::math::policies;
-
 // Define a policy that does not throw on overflow:
 typedef policy<overflow_error<errno_on_error> > my_policy;
-
 // Define the special functions in this scope to use the policy:   
 BOOST_MATH_DECLARE_SPECIAL_FUNCTIONS(my_policy)
 }
 
 // Now we can use myspace::cyl_bessel_i etc.
 // They will automatically use "my_policy":
-
 
 
 
@@ -63,7 +58,6 @@ double rcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){
 }
 
 
-
 // Writing log-BesselI function:
 
 // [[Rcpp::export]]
@@ -95,22 +89,28 @@ double lrcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){
 }
 
 
+//====================================================================================
+// Performance testing in R below:
+//====================================================================================
 
 /*** R
 library(rstiefel)
 library(microbenchmark)
 
-
 besselI(5,500,T)
 rcpp_besselI(5,500,T)
 rcpp_boost_besselI(5,500,T)
 rcpp_boost_besselI_overflow_fixed(5,500,T)
-#microbenchmark(besselI(5,100,T), rcpp_besselI(5,100,T), rcpp_boost_besselI(5,100,T), rcpp_boost_besselI_overflow_fixed(5,100,T))
+
 log(besselI(5,500,T))
 lrcpp_besselI(5,500,T)
 lrcpp_boost_besselI(5,500,T)
 lrcpp_boost_besselI_overflow_fixed(5,500,T)
-#microbenchmark(log(besselI(5,100,T)), lrcpp_besselI(5,100,T), lrcpp_boost_besselI(5,100,T))
-microbenchmark(besselI(5,500,T), log(besselI(5,500,T)), rcpp_besselI(5,500,T), lrcpp_besselI(5,500,T), rcpp_boost_besselI(5,500,T), lrcpp_boost_besselI(5,500,T), rcpp_boost_besselI_overflow_fixed(5,500,T), lrcpp_boost_besselI_overflow_fixed(5,500,T))
+
+microbenchmark(besselI(5,500,T), log(besselI(5,500,T)), rcpp_besselI(5,500,T), 
+               lrcpp_besselI(5,500,T), rcpp_boost_besselI(5,500,T), 
+               lrcpp_boost_besselI(5,500,T), rcpp_boost_besselI_overflow_fixed(5,500,T), 
+               lrcpp_boost_besselI_overflow_fixed(5,500,T)
+               )
 
 */
