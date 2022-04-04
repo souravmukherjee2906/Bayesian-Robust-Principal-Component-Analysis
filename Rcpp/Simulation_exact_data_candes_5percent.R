@@ -3,6 +3,9 @@
 ## This file contains codes for the simulation of estimates of the low-rank and sparse
 ## components for several iterations.
 
+## Actual data is generated according to E. Candes's paper (does not involve any q).
+## See lines 98 - 125.
+
 
 #------------------------------------------------------------------------------------
 ## Remove everything from the Global environment
@@ -42,7 +45,7 @@ library(coda)
 library(e1071)
 library(ggplot2)
 library(Matrix)   # needed for the generating random sparse matrix true S_star, 
-                  # as described in E. candes's paper.
+                  # as described in E. Candes's paper.
 
 
 #------------------------------------------------------------------------------------
@@ -92,33 +95,50 @@ for(n in n_values_seq){
   p <- n
   r <- round(0.05*n)    # 1 <= r <= n
   
-  ## Getting E_star where each entry is iid N(0, 0.01) 
-  ## i.e., actual value of Sigma^2 is 0.01
-  E_star <- matrix(rnorm(n*p, mean = 0, sd = 0.1), nrow = n, ncol = p)
+  ## Actual data is generated according to Candes's paper (does not involve any q).
+  ## There is no E_star in the data generating process in Candes's paper. 
+  ## So, E_star = 0 in this case.
   
-  ## S_star in actual data is generated according to q1 = 0.95
-  S_star_rnorm <- matrix(rnorm(n*p, mean = 0, sd = sqrt(tow2)), nrow = n, ncol = p)
-  S_star_runif <- matrix(runif(n*p), nrow = n, ncol = p)
-  S_actual_MCC <- (S_star_runif > q1)*1
-  S_star <- S_star_rnorm * S_actual_MCC
+  ## Generating L_star as described in Candes's paper.
+  L_star1 <- matrix(rnorm(n*r, mean = 0, sd = sqrt(1/n)), nrow = n, ncol = r)
+  L_star2 <- matrix(rnorm(p*r, mean = 0, sd = sqrt(1/p)), nrow = p, ncol = r)  
+  # here, p = n in Candes's paper.
+  L_star <- L_star1 %*% t(L_star2)  # it is rank-r matrix, as described in Candes's paper.
   
-  ## Getting U_star of order n*r.
-  ## Generate a random orthonormal matrix of order n*n. 
-  ## The randomness is meant w.r.t (additively invariant) Haar measure on O(n).
-  U_star <- randortho(n, type = "orthonormal")[ ,1:r] # takes the first r many columns.
+  ## Generating S_star as described in Candes's paper.
+  P_omega_sparse <- rsparsematrix(nrow = n, ncol = p, nnz = round(0.05*(n^2)), rand.x = NULL)
+  P_omega_compressed <- P_omega_sparse*1     # Sparse Matrix in the "dgCMatrix" class
+                                             # in a compressed form containing 1 and 0.
+  P_omega <- as.matrix(P_omega_compressed)   # Regular spare matrix containing 1 and 0.
+  E_unif <- matrix(runif(n*p), nrow = n, ncol = p) # here, p = n in Candes's paper.
+  E_ber1 <- (E_unif >= 0.5)*1          # entries have 0 and 1
+  E_ber2 <- (-1)*((E_unif < 0.5)*1)    # entries have 0 and -1
+  E_ber <- E_ber1 + E_ber2             # entries are independent Bernoulli (-1, 1)
+                                       # as described in Candes's paper.
+  S_star <- P_omega * E_ber            # it is a sparse matrix with elements in (-1,0,1) 
+                                       # and number of non-zero entries = round(0.05*n^2), 
+                                       # as described in Candes's paper.
+  S_actual_MCC <- P_omega              # it is needed to calculate Sensititvity, 
+                                       # Specificity and MCC later.
   
-  ## Similarly getting V_star of order p*r.
-  V_star <- randortho(p, type = "orthonormal")[ ,1:r]
+  ## Define the true model, as described in candes paper.
+  Y <- L_star + S_star
   
-  ## Getting D_star of order r*r.
-  d_star <- c(runif(r-1, min = 1, max = 2), runif(1, min = 0.5, max = 1.5))
-  D_star <- rcpp_only_diag_cumprod(d_star)
+  ## Getting (True) D_star (and d_star) by using Singular value
+  ## decomposition: L = UDV' implies D = U'LV.
+  ## This (True) d_star has been created solely for the purpose of caculating 
+  ## distance_d = max(abs(d_bar - d_star)) later during each iteration of (Our) 
+  ## Method 1 and 2.
   
-  ## L_star of order n*r.
-  L_star <- U_star %*% D_star %*% t(V_star)
+  ## Getting (True) D_star by using the Singular Value Decomposition, 
+  ## when actual data is generated according to Candes's paper.
+  D_star <- t(svd(L_star, nu = r, nv = r)$u) %*% L_star %*% (svd(L_star, nu = r, nv = r)$v)
   
-  ## Define the true model.
-  Y <- (U_star %*% D_star %*% t(V_star)) + S_star + E_star
+  ## Getting (True) d_star from above D_star, 
+  ## using the way we defined d_star: d[i] = D[i,i]/D[i+1, i+1] and d[r] = D[r,r].
+  D_star_vec <- diag(D_star)
+  d_star <- D_star_vec %*% diag(c(1/D_star_vec[-1], 1))
+  
   
   ## AFTER GENERATING TRUE DATA Y
   
