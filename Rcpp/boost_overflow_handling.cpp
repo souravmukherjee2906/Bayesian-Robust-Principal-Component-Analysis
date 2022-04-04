@@ -27,6 +27,8 @@ BOOST_MATH_DECLARE_SPECIAL_FUNCTIONS(my_policy)
 
 
 //------------------------------------------------------------------------------------
+// Writing BesselI functions:
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double rcpp_besselI(double x, double nu, bool T_or_F){
@@ -37,8 +39,6 @@ double rcpp_besselI(double x, double nu, bool T_or_F){
 }
 
 
-//------------------------------------------------------------------------------------
-
 // [[Rcpp::export]]
 double rcpp_boost_besselI(double x, double nu, bool T_or_F){
   if(T_or_F == false){
@@ -48,8 +48,6 @@ double rcpp_boost_besselI(double x, double nu, bool T_or_F){
   }
 }
 
-
-//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double rcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){   
@@ -65,8 +63,8 @@ double rcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){
 
 
 //------------------------------------------------------------------------------------
-
-// Writing log-BesselI function:
+// Writing log-BesselI functions:
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double lrcpp_besselI(double x, double nu, bool T_or_F){
@@ -76,8 +74,6 @@ double lrcpp_besselI(double x, double nu, bool T_or_F){
   return log(out);
 }
 
-
-//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double lrcpp_boost_besselI(double x, double nu, bool T_or_F){
@@ -89,8 +85,6 @@ double lrcpp_boost_besselI(double x, double nu, bool T_or_F){
 }
 
 
-//------------------------------------------------------------------------------------
-
 // [[Rcpp::export]]
 double lrcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){
   if(T_or_F == false){
@@ -99,6 +93,7 @@ double lrcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){
     return (log(myspace::cyl_bessel_i(nu, x)) - x);
   }
 }
+
 
 
 //====================================================================================
