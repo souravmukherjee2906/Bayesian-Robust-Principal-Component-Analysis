@@ -11,6 +11,7 @@ using namespace arma;
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(BH)]]
 
+//------------------------------------------------------------------------------------
 
 namespace myspace
 {
@@ -25,6 +26,7 @@ BOOST_MATH_DECLARE_SPECIAL_FUNCTIONS(my_policy)
 // They will automatically use "my_policy":
 
 
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double rcpp_besselI(double x, double nu, bool T_or_F){
@@ -34,6 +36,8 @@ double rcpp_besselI(double x, double nu, bool T_or_F){
   return out;
 }
 
+
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double rcpp_boost_besselI(double x, double nu, bool T_or_F){
@@ -45,10 +49,12 @@ double rcpp_boost_besselI(double x, double nu, bool T_or_F){
 }
 
 
+//------------------------------------------------------------------------------------
+
 // [[Rcpp::export]]
 double rcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){   
-  // using my_policy so that it does *not* throw on overflow
-  //despite the large value unlike default policy boost::math::cyl_bessel_i
+  // using my_policy so that it does *not* throw on overflow despite
+  // the large value unlike default policy boost::math::cyl_bessel_i
   
   if(T_or_F == false){
     return (myspace::cyl_bessel_i(nu, x));
@@ -57,6 +63,8 @@ double rcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){
   }
 }
 
+
+//------------------------------------------------------------------------------------
 
 // Writing log-BesselI function:
 
@@ -69,6 +77,8 @@ double lrcpp_besselI(double x, double nu, bool T_or_F){
 }
 
 
+//------------------------------------------------------------------------------------
+
 // [[Rcpp::export]]
 double lrcpp_boost_besselI(double x, double nu, bool T_or_F){
   if(T_or_F == false){
@@ -78,6 +88,8 @@ double lrcpp_boost_besselI(double x, double nu, bool T_or_F){
   }
 }
 
+
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 double lrcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){
