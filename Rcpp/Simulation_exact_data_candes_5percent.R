@@ -105,7 +105,10 @@ for(n in n_values_seq){
   # here, p = n in Candes's paper.
   L_star <- L_star1 %*% t(L_star2)  # it is rank-r matrix, as described in Candes's paper.
   
-  ## Generating S_star as described in Candes's paper.
+  ## Generating S_star as described in Candes's paper with 5% non-zero elements.
+  ## We can also opt for 10% non-zero elements in S_star, in which case we need to use
+  ## nnz = round(0.10*(n^2)) in "P_omega_sparse" defined below.
+  ## If 10% choice is used, change the name of the pdf file in line 84 accordingly.
   P_omega_sparse <- rsparsematrix(nrow = n, ncol = p, nnz = round(0.05*(n^2)), rand.x = NULL)
   P_omega_compressed <- P_omega_sparse*1     # Sparse Matrix in the "dgCMatrix" class
                                              # in a compressed form containing 1 and 0.
