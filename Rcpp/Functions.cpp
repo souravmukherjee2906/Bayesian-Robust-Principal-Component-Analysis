@@ -16,18 +16,12 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 NumericMatrix rcpp_only_diag_cumprod(NumericVector v){
-  int r = v.size();
+  int r = v.length();
   NumericVector cump_rev = cumprod(rev(v));
   NumericVector rev_cump_rev = rev(cump_rev);
-  NumericMatrix out(r); // Creates a r*r matrix of 0's. 
+  NumericMatrix out(r); // Creates a r*r matrix of 0's.
   for(int i=0; i<r; ++i){
-    for(int j=0; j<r; ++j){
-      if(i==j){
-        out(i,j) = rev_cump_rev[i];
-      }else{
-        out(i,j) = 0;
-      }
-    }
+    out(i,i) = rev_cump_rev[i];
   }
   return out;
 }
