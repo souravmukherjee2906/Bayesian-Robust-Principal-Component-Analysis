@@ -166,30 +166,21 @@ double rcpp_only_invgamma(double shape, double rate){
 // [[Rcpp::export]]
 NumericVector rcpp_only_d_update_mat(NumericVector d, NumericMatrix A, double Sigma2, 
                                      int n, int p, int r) {
-  
   for(int i = 0; i < r; ++i){
     NumericMatrix D_cap(r);
-    for(int j=0; j< r; ++j){
-      for(int k=0; k< r; ++k){
-        if((j == k) && (j <= i)){
-          D_cap(j,j) = 1;
-          for(int l=j; l< r; ++l){
-            if(l==i){
-              D_cap(j,j) = D_cap(j,j);
-            }else{
-              D_cap(j,j) = D_cap(j,j) * d[l];
-            }
-          }
-        }
-        else{
-          D_cap(j,k) = 0;
-        }
-      }
-    }
-    
     double num = 0;
     double denom = 0;
-    for(int j=0; j<r; ++j){
+    for(int j=0; j< r; ++j){
+      if(j <= i){
+        D_cap(j,j) = 1;
+        for(int l=j; l< r; ++l){
+          if(l==i){
+            D_cap(j,j) = D_cap(j,j);
+          }else{
+            D_cap(j,j) = D_cap(j,j) * d[l];
+          }
+        }
+      }
       num = num + (D_cap(j,j)*A(j,j));
       denom = denom + pow(D_cap(j,j), 2.0);
     }
@@ -201,7 +192,6 @@ NumericVector rcpp_only_d_update_mat(NumericVector d, NumericMatrix A, double Si
     else{
       d[i] = rcpp_only_rtruncnorm(0, R_PosInf, num/denom, sqrt(Sigma2/denom));
     }
-    
   }
   return d;
 }
