@@ -1,6 +1,6 @@
 //====================================================================================
-// This file deals with optimizations of matrix operations using Blaze, an open-source
-// and high-performance C++ math library for dense and sparse arithmetic.
+// This file contains some highly optimized functions for matrix operations, and their
+// performance comparisons with comparatively slower algorithms/functions.
 //====================================================================================
 
 #define ARMA_64BIT_WORD
@@ -150,9 +150,10 @@ NumericMatrix rcpp_mat_mult(NumericMatrix A, NumericMatrix B){
 
 
 //------------------------------------------------------------------------------------
-// Lines 158-161 contains the fastest matrix multiplication algorithm among all of the 
+// Lines 159-162 contains the fastest matrix multiplication algorithm among all of the 
 // above.
-// It directly uses the functions from the Rfast.h header file in the Blaze C++ library.
+// It directly uses the functions from the Rfast.h header file via LinkingTo Rfast in C++.
+// Here, 'Rfast' is a collection of efficient and extremely fast R functions.
 //------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
@@ -160,6 +161,11 @@ NumericMatrix mat_mult(NumericMatrix A, NumericMatrix B){
 return Rfast::matrix::matrix_multiplication(A,B);
 }
 
+
+//------------------------------------------------------------------------------------
+// Lines 170-173 outputs the transpose of a matrix A by directly using the functions 
+// from the Rfast.h header file via LinkingTo Rfast in C++.
+//------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
 NumericMatrix trans(NumericMatrix A){
@@ -178,11 +184,9 @@ library(microbenchmark)
 library(Rfast)
 library(tictoc)
 
-
 A <- matrix(rnorm(3000*150), nrow = 3000)
 B <- matrix(rnorm(3000*3000), nrow = 3000)
 C <- matrix(rnorm(3000*150), nrow = 3000)
-
 
 tic()
 D <- matrix_multiply(matrix_multiply(trans(A),B), C)
@@ -195,7 +199,6 @@ toc()
 tic()
 M <- t(A)%*%B%*%C
 toc()
-
 
 microbenchmark(A%*%B, 
                matrix_multiply(A,B), 
