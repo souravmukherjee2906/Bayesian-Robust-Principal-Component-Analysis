@@ -1,7 +1,7 @@
 ## We are trying to decompose a noisy image matrix into low-rank component (foreground),
 ## sparse component and noise component (background).
 ## This file contains codes for generating the plot of Frobenius norm (L^2-norm) of the 
-## overall error Vs. rank of the image matrix.
+## overall error Vs. rank of the low-rank component.
 
 ## Actual data is generated according to 'Agarwal, Negahban and Wainwright (2012)' paper.
 ## See lines 95-105 and 112-128.
@@ -66,16 +66,16 @@ q <- (1 - 0.2171)   # For any n, Actual data Y_(n*n) (in particular, S_star_(n*n
 
 ## Other input values
 a <- 2 # shape parameter for the inverse gamma distribution of sigma^2 (should be > 0)
-b <- 1  # rate parameter for the inverse gamma distribution of sigma^2 (should be > 0)
+b <- 1 # rate parameter for the inverse gamma distribution of sigma^2 (should be > 0)
 K <- 13000  # Total number of iterations.
-tow2 <- 20   # the variance tow^2 of the normal distribution in the mixture prior of S.
+tow2 <- 20  # the variance tow^2 of the normal distribution in the mixture prior of S.
 burn_in <- 5000   # Number of burn-ins.
 rank_ratio <- seq(from = 0.05, to = 0.10, by = 0.05)
 
 
 #------------------------------------------------------------------------------------
 ## Create a pdf file containing the plot of Frobenius norm (L^2-norm) of the 
-## overall error Vs. rank of the image matrix.
+## overall error Vs. rank of the low-rank component.
 #------------------------------------------------------------------------------------
 pdf('Agarwal_error_vs_rank.pdf', width = 11.694, height = 8.264)
 
