@@ -1,3 +1,8 @@
+//====================================================================================
+// This file contains error handling policies in dealing with overflow error
+// while using Boost C++ libraries.
+//====================================================================================
+
 #define ARMA_64BIT_WORD
 #include <RcppArmadillo.h>
 #include <algorithm>
@@ -11,6 +16,9 @@ using namespace arma;
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(BH)]]
 
+
+//------------------------------------------------------------------------------------
+// Defining a policy that does not throw on overflow:
 //------------------------------------------------------------------------------------
 
 namespace myspace
