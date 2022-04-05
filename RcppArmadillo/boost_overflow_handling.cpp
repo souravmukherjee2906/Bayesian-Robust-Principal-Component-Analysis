@@ -35,7 +35,7 @@ BOOST_MATH_DECLARE_SPECIAL_FUNCTIONS(my_policy)
 
 
 //------------------------------------------------------------------------------------
-// Writing BesselI functions:
+// BesselI functions:
 //------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
@@ -71,7 +71,7 @@ double rcpp_boost_besselI_overflow_fixed(double x, double nu, bool T_or_F){
 
 
 //------------------------------------------------------------------------------------
-// Writing log-BesselI functions:
+// log-BesselI functions:
 //------------------------------------------------------------------------------------
 
 // [[Rcpp::export]]
