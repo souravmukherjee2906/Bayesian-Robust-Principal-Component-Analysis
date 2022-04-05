@@ -104,7 +104,7 @@ Simulation.from.stan <- function(n, p, r, q, tow02, tow2, a, b, Y){
   # Diagnose
   print(Simul_fit)
   
-  # Extracting parameters and plotting graph
+  # Extract the parameters.
   Simul_params <- extract(Simul_fit)
   print(str(Simul_params))
   
