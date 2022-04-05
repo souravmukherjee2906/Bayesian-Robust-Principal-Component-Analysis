@@ -15,7 +15,6 @@ functions {
     term3 = sum(log((q/sqrt(tow02))*exp((-1/(2*tow02))*(S .* S)) + ((1-q)/sqrt(tow2))*exp((-1/(2*tow2))*(S .* S))));
     
     out = term1 + term2 + term3;
-    //out = - (((n*p*0.5) + a + 1)*log(sigma2)) - ((1/(2*sigma2))*trace(crossprod(Z))) - ((0.5)*trace(S_U + S_V)) - ((0.5)*(d'*d)) - (b/sigma2) - ((1/(2*tow2)) * trace(crossprod(S)));
     return(out);
   }
 }
@@ -26,7 +25,7 @@ data {
   int<lower=1> r;
   real<lower=0,upper=1> q;
   real<lower=0> tow02;      // tow_0^2
-  real<lower=0> tow2;        // tow^2
+  real<lower=0> tow2;       // tow^2
   real<lower=0> a;          // prior of sigma2 ~ Inv_gamma(a,b)
   real<lower=0> b;
   matrix[n,p] Y;
