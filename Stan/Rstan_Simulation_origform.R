@@ -21,12 +21,9 @@ n <- 1000
 p <- n
 r <- round(0.05*n)
 
-print("n is :")
-print(n)
-print("p is :")
-print(p)
-print("r is :")
-print(r)
+print(paste("n is :", n))
+print(paste("p is :", p))
+print(paste("r is :", r))
 
 ## Other input values
 a <- 4  # shape parameter for the inverse gamma distribution of sigma^2 (should be > 0).
