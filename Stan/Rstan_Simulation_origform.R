@@ -82,8 +82,8 @@ Simulation.from.stan <- function(n, p, r, q, tow02, tow2, a, b, Y){
     S_U0 <- t(X_10)%*%X_10
     S_V0 <- t(X_20)%*%X_20
     L0 <- U0 %*% D0 %*% t(V0)
-    return(list(X_1 = X_10, X_2 = X_20, d = d0, S = S0, sigma2 = sigma20, U = U0, V = V0, 
-                S_U = S_U0, S_V = S_V0, L = L0))
+    return(list(X_1 = X_10, X_2 = X_20, d = d0, S = S0, sigma2 = sigma20, U = U0,  
+                V = V0, S_U = S_U0, S_V = S_V0, L = L0))
   }
   
   chains_vec <- 1:4
