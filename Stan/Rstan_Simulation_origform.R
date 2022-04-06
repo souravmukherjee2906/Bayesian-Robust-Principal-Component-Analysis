@@ -9,8 +9,6 @@ library(caret)
 library(coda)                     
 library(e1071)                    
 library(ggplot2)
-library(tictoc)
-library(microbenchmark)
 
 q1 <- 0.95  # For any n, Actual data Y_(n*n) (in particular, S_star_(n*n)) 
             # will be generated according to q = 0.95
