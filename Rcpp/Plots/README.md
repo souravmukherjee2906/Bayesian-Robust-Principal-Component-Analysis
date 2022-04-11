@@ -1,0 +1,1 @@
+- This subfolder contains plots simulated from the codes in the Rcpp folder: https://github.com/souravmukherjee2906/Bayesian-Robust-Principal-Component-Analysis/tree/main/Rcpp
